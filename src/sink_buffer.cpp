@@ -91,17 +91,7 @@ private:
 int main()
 {
     outstream<buffer_sink<char>> out;
-    out << 123;
-    out.flush();
-    out << ' ';
-    out.flush();
-    out << 456;
-    out.flush();
-    out << ' ';
-    out.flush();
-    out << 3.1415;
-    out.flush();
-    out << " abcdefg";
+    out << 123 << ' ' << 456;
     out.flush();
     std::cout << out->view() << std::endl;
     return 0;
