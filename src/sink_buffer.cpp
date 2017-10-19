@@ -2,7 +2,7 @@
 
 using namespace nova;
 
-template<typename CharT, typename Traits = std::char_traits<CharT>>
+template<typename CharT>
 class buffer_sink
 {
 public:
