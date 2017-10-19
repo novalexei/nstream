@@ -7,7 +7,7 @@ If you're wondering why I had to write my own streams library rather than
 using excellent __boost::iostreams__ I answer it in
 ["Why new stream library"](https://github.com/novalexei/nstream/wiki/Why-new-stream-library)
 
-For details on how to write C++ streams with __nova::stream__ __nova::stream__ check out the
+For details on how to write C++ streams with __nova::stream__ check out the
 [Tutorial](https://github.com/novalexei/nstream/wiki/nstream-Tutorial)
 
 __nova::stream__ also has an exceptional [performance](https://github.com/novalexei/nstream/wiki/nstream-Performance)
