@@ -290,22 +290,23 @@ protected:
         auto [buf, size] = _sink.get_out_buffer();
         if (!buf || size <= 0) return traits_type::eof();
         *buf = ch;
-        _buf_type::setp(buf + 1, buf + size);
+        _buf_type::setp(buf, buf + size);
+        _buf_type::pbump(1);
         return ch;
 #else
         auto res = _sink.get_out_buffer();
         if (!res.first || res.second <= 0) return traits_type::eof();
         *res.first = ch;
         _buf_type::setp(res.first + 1, res.first + res.second);
+        _buf_type::pbump(1);
         return ch;
 #endif
     }
 
     int sync() override
     {
-        /* Here we need to calculate the size as _buf_type::pptr()-_buf_type::pbase()+1 because we set
-         * buffer in overflow method starting from the second character */
-        _sink.flush(_buf_type::pptr() - _buf_type::pbase() + 1);
+        _sink.flush(_buf_type::pptr() - _buf_type::pbase());
+        _buf_type::setp(_buf_type::pptr(), _buf_type::epptr());
         return 0;
     }
 
