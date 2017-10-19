@@ -79,7 +79,7 @@ int main()
 }
 ```
 
-__nova::stream__ also has an exceptional [performance](https://github.com/novalexei/nstream/wiki/Performance)
+__nova::stream__ also has an exceptional [performance](https://github.com/novalexei/nstream/wiki/nstream-Performance)
 
 For details on how to use __nova::stream__ check out the
 [Tutorial](https://github.com/novalexei/nstream/wiki/nstream-Tutorial)
