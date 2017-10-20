@@ -1,6 +1,6 @@
 # nova::stream
 
-Very simple C++ single-include-file library which helps to write C++ input/output streams easily.
+Very simple C++ single-include-file framework which helps to write C++ input/output streams easily.
 
 __nova::stream__ is similar to [boost::iostreams](http://www.boost.org/doc/libs/1_65_1/libs/iostreams/doc/index.html).
 If you're wondering why I had to write my own streams library rather than
