@@ -17,6 +17,7 @@ public:
     explicit string_device(string_type str) : _buffer{std::move(str)} {}
     ~string_device() noexcept = default;
 
+    /* sink functions */
     std::streamsize write(const CharT* s, std::streamsize n)
     {
         _buffer.append(s, n);
@@ -24,6 +25,7 @@ public:
     }
     void flush() { }
 
+    /* in_buffer_provider function */
     std::pair<const CharT*, std::size_t> get_in_buffer()
     {
         if (_in_size == _buffer.size()) return {nullptr, 0};
