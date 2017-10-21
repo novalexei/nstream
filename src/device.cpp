@@ -18,7 +18,7 @@ public:
     ~string_device() noexcept = default;
 
     /* sink functions */
-    std::streamsize write(const CharT* s, std::streamsize n)
+    std::streamsize write(const char_type* s, std::streamsize n)
     {
         _buffer.append(s, n);
         return n;
@@ -26,7 +26,7 @@ public:
     void flush() { }
 
     /* in_buffer_provider function */
-    std::pair<const CharT*, std::size_t> get_in_buffer()
+    std::pair<const char_type*, std::size_t> get_in_buffer()
     {
         if (_in_size == _buffer.size()) return {nullptr, 0};
         auto in_start = _in_size;

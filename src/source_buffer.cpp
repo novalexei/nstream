@@ -14,7 +14,7 @@ public:
 
     explicit string_view_buffer_provider(string_view_type str) : _str{str} {}
 
-    std::pair<const CharT*, std::size_t> get_in_buffer()
+    std::pair<const char_type*, std::size_t> get_in_buffer()
     {
         if (_buffer_provided) return {nullptr, 0};
         _buffer_provided = true;

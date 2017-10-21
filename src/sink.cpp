@@ -15,7 +15,7 @@ public:
     string_sink() : _buffer{} {}
     explicit string_sink(string_type str) : _buffer{str} {}
 
-    std::streamsize write(const CharT* s, std::streamsize n)
+    std::streamsize write(const char_type* s, std::streamsize n)
     {
         _buffer.append(s, n);
         return n;
