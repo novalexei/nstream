@@ -16,7 +16,7 @@ http://boost.org/LICENSE_1_0.txt
  * @brief Definitions for custom implementation of <code>std::istream</code>
  * and <code>std::ostream</code> objects.
  *
- * This resembles to the project boost::iostreams, but provides new sink and
+ * This resembles to the project <b>boost::iostreams</b>, but provides new sink and
  * source - buffer provider, which provides the buffer directly to <code>inbuf</code>
  * and <code>outbuf</code> which eliminates unnecessary copying.
  *
@@ -164,8 +164,8 @@ struct source {};
  * it means that no more characters can be written into the output buffer.
  *
  * Note that in C++17 this method can also return
- * <code>std::tuple<char_type*, std::size_t><code> or
- * <code>struct {char_type*, std::size_t}<code>.
+ * <code>std::tuple<char_type*, std::size_t></code> or
+ * <code>struct {char_type*, std::size_t}</code>.
  *
  * Method <code>flush</code> is called when the stream is either flushed
  * or closed. As the argument it receives the number of characters written
@@ -197,9 +197,8 @@ struct out_buffer_provider {};
  * times until it returns <code>{nullptr, 0}</code>.
  *
  * Note that in C++17 this method can also return
- * <code>std::tuple<const char_type*, std::size_t><code> or
- * <code>struct {const char_type*, std::size_t}<code>.
-
+ * <code>std::tuple<const char_type*, std::size_t></code> or
+ * <code>struct {const char_type*, std::size_t}</code>.
  */
 struct in_buffer_provider {};
 
@@ -383,11 +382,11 @@ private:
  *
  * This object uses the <code>Sink</code> provided as a template parameter
  * to write data to. The <code>Sink</code> type should follow the
- * specifications of wither {@see sink} or {@see out_buffer_provider}.
+ * specifications of either nova::sink or nova::out_buffer_provider.
  *
  * @tparam Sink sink object to use to write data.
- * @tparam Buffering Buffer size to be used. It must be {@see non_buffered}
- *                   if <code>out_buffer_provider</code> is used as
+ * @tparam Buffering Buffer size to be used. It must be nova::non_buffered
+ *                   if nova::out_buffer_provider is used as
  *                   <code>Sink</code>
  * @tparam Traits character traits type to be used in this stream.
  *
@@ -676,10 +675,10 @@ private:
  *
  * This object uses the <code>Source</code> provided as a template parameter
  * to write data to. The <code>Source</code> type should follow the
- * specifications of wither {@see source} or {@see in_buffer_provider}.
+ * specifications of wither nova::source or nova::in_buffer_provider.
  *
  * @tparam Source source type to use to read data from.
- * @tparam Buffering Buffer size to be used. It must be {@see non_buffered}
+ * @tparam Buffering Buffer size to be used. It must be nova::non_buffered
  *                   if <code>in_buffer_provider</code> is used as
  *                   <code>Source</code>
  * @tparam Traits character traits type to be used in this stream.
@@ -874,19 +873,19 @@ private:
  * <code>Device</code>.
  *
  * <code>Device</code> is following specifications of both <code>Sink</code>
- * as prescribed by {@see outstream} and <code>Source</code> as prescribed by
- * {@see instream}.
+ * as prescribed by nova::outstream and <code>Source</code> as prescribed by
+ * nova::instream.
  *
  * <code>Device</code> class should have type definitions for
- * <code>in_category</code> (it must be either {@see source} or
- * {@see in_buffer_provider) and <code>out_category</code> (it must be
- * wither {@see sink} or {@see out_buffer_provider)
+ * <code>in_category</code> (it must be either nova::source or
+ * nova::in_buffer_provider) and <code>out_category</code> (it must be
+ * either nova::sink or nova::out_buffer_provider)
  *
  * Class <code>device_outstream</code> can be created with instance of
  * <code>Device</code> class.
  *
  * @tparam Device source type to use to read data from.
- * @tparam Buffering Buffer size to be used. It must be {@see non_buffered}
+ * @tparam Buffering Buffer size to be used. It must be nova::non_buffered
  *                   if <code>out_buffer_provider</code> is used as
  *                   <code>out_category</code>
  * @tparam Traits character traits type to be used in this stream.
@@ -909,19 +908,19 @@ using device_outstream = outstream<device_sink<Device>, Buffering, Traits>;
  * <code>Device</code>.
  *
  * <code>Device</code> is following specifications of both <code>Sink</code>
- * as prescribed by {@see outstream} and <code>Source</code> as prescribed by
- * {@see instream}.
+ * as prescribed by nova::outstream and <code>Source</code> as prescribed by
+ * nova::instream.
  *
  * <code>Device</code> class should have type definitions for
- * <code>in_category</code> (it must be either {@see source} or
- * {@see in_buffer_provider) and <code>out_category</code> (it must be
- * wither {@see sink} or {@see out_buffer_provider)
+ * <code>in_category</code> (it must be either nova::source or
+ * nova::in_buffer_provider) and <code>out_category</code> (it must be
+ * either nova::sink or nova::out_buffer_provider)
  *
  * Class <code>device_instream</code> can be created with instance of
  * <code>Device</code> class.
  *
  * @tparam Device source type to use to read data from.
- * @tparam Buffering Buffer size to be used. It must be {@see non_buffered}
+ * @tparam Buffering Buffer size to be used. It must be nova::non_buffered
  *                   if <code>in_buffer_provider</code> is used as
  *                   <code>out_category</code>
  * @tparam Traits character traits type to be used in this stream.

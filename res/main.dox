@@ -1,0 +1,39 @@
+/**
+ * \mainpage nova::stream API
+ *
+ * nova::stream API documentation:
+ *
+ * Core concepts:
+ * <ul>
+ *   <li>nova::sink - Sink concept for nova::outstream.</li>
+ *   <li>nova::source - Source concept for nova::instream</li>
+ *   <li>nova::out_buffer_provider - buffer provider concept for nova::outstream</li>
+ *   <li>nova::in_buffer_provider - buffer provider concept for nova::instream</li>
+ * </ul>
+ * Core classes:
+ * <ul>
+ *   <li>nova::instream - C++ input stream implementation</li>
+ *   <li>nova::outstream - C++ output stream implementation</li>
+ * </ul>
+ * Buffering support:
+ * <ul>
+ *   <li>nova::buffering - Buffer size information</li>
+ *   <li>nova::non_buffered - Type definition for 0 bytes buffer (no buffering)</li>
+ *   <li>nova::buffer_8 - Type definition for 8b buffer</li>
+ *   <li>nova::buffer_16 - Type definition for 16b buffer</li>
+ *   <li>nova::buffer_32 - Type definition for 32b buffer</li>
+ *   <li>nova::buffer_64 - Type definition for 64b buffer</li>
+ *   <li>nova::buffer_128 - Type definition for 128b buffer</li>
+ *   <li>nova::buffer_256 - Type definition for 256b buffer</li>
+ *   <li>nova::buffer_512 - Type definition for 512b buffer</li>
+ *   <li>nova::buffer_1k - Type definition for 1Kb buffer</li>
+ *   <li>nova::buffer_2k - Type definition for 2Kb buffer</li>
+ *   <li>nova::buffer_4k - Type definition for 4Kb buffer</li>
+ *   <li>nova::buffer_8k - Type definition for 8Kb buffer</li>
+ * </ul>
+ * Device type definition:
+ * <ul>
+ *   <li>nova::device_instream - Type definition for device input stream</li>
+ *   <li>nova::device_outstream - Type definition for device output stream</li>
+ * </ul>
+ */
