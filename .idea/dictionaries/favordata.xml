@@ -4,6 +4,7 @@
       <w>iobuf</w>
       <w>iostream</w>
       <w>istringstream</w>
+      <w>struct</w>
     </words>
   </dictionary>
 </component>

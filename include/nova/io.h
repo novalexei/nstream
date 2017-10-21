@@ -28,6 +28,8 @@ namespace nova {
 
 /**
  * Template class holder of the buffer size.
+ *
+ * @tparam BufSize buffer size
  */
 template<std::size_t BufSize>
 struct buffering
@@ -91,11 +93,11 @@ typedef buffering<8192> buffer_8k;
  * Sink tag.
  *
  * This tag is used for the regular sinks provided to
- * <code>nova::basic_outstream</code>. This is default tag and it
- * is not required to define it. The object with this tag is expected
- * to have the following (optional) <code>category</code> definition:
+ * <code>nova::basic_outstream</code>. The object with this tag
+ * is expected to have the following type definitions:
  *
  * ~~~~~{.cpp}
+ * typedef <character type> char_type;
  * typedef sink category;
  * ~~~~~
  *
@@ -118,11 +120,11 @@ struct sink {};
  * Source tag.
  *
  * This tag is used for the regular sources provided to
- * <code>nova::basic_instream</code>. This is default tag and it
- * is not required to define it. The object with this tag is expected
- * to have the following (optional) <code>category</code> definition:
+ * <code>nova::basic_instream</code>. The object with this tag is expected
+ * to have the following type definitions:
  *
  * ~~~~~{.cpp}
+ * typedef <character type> char_type;
  * typedef source category;
  * ~~~~~
  *
@@ -132,9 +134,9 @@ struct sink {};
  * std::streamsize read(const CharT* s, std::streamsize n);
  * ~~~~~
  *
- * Method <code>read</code> will read from the underlying stream into
- * buffer <code>s</code> up to <code>n</code> characters and return the
- * actual number of characters read.
+ * Method <code>read</code> reads from the underlying stream into buffer
+ * <code>s</code> up to <code>n</code> characters and returns the actual
+ * number of characters read.
  */
 struct source {};
 /**
@@ -142,10 +144,10 @@ struct source {};
  *
  * This tag is used to indicate that this object can be used as buffer
  * provider for both <code>nova::outstream</code>. The object
- * with this tag is expected to have the following <code>category</code>
- * definition:
+ * with this tag is expected to have the following type definitions:
  *
  * ~~~~~{.cpp}
+ * typedef <character type> char_type;
  * typedef out_buffer_provider category;
  * ~~~~~
  *
@@ -156,11 +158,19 @@ struct source {};
  * void flush(std::size_t size);
  * ~~~~~
  *
- * Method <code>get_buffer</code> returns <code>std::pair</code> containing
- * buffer for the stream buffer to use and number of characters available
- * for the stream to use.
+ * Method <code>get_out_buffer</code> returns <code>std::pair</code>
+ * containing buffer for the stream to use and number of characters
+ * available in this buffer. If this method returns <code>{nullptr, 0}</code>
+ * it means that no more characters can be written into the output buffer.
  *
- * Method <code>flush</code> flushes underlying stream if needed.
+ * Note that in C++17 this method can also return
+ * <code>std::tuple<char_type*, std::size_t><code> or
+ * <code>struct {char_type*, std::size_t}<code>.
+ *
+ * Method <code>flush</code> is called when the stream is either flushed
+ * or closed. As the argument it receives the number of characters written
+ * to the stream since last call to <code>get_out_buffer</code> or
+ * <code>flush</code>.
  */
 struct out_buffer_provider {};
 /**
@@ -168,10 +178,10 @@ struct out_buffer_provider {};
  *
  * This tag is used to indicate that this object can be used as buffer
  * provider for both <code>servlet::basic_instream</code>. The object
- * with this tag is expected to have the following <code>category</code>
- * definition:
+ * with this tag is expected to have the following type definitions:
  *
  * ~~~~~{.cpp}
+ * typedef <character type> char_type;
  * typedef in_buffer_provider category;
  * ~~~~~
  *
@@ -181,9 +191,15 @@ struct out_buffer_provider {};
  * std::pair<const CharT*, std::size_t> get_in_buffer();
  * ~~~~~
  *
- * Method <code>get_buffer</code> returns <code>std::pair</code> containing
- * buffer for the stream buffer to use and number of characters available
- * for the stream to use.
+ * Method <code>get_in_buffer</code> returns <code>std::pair</code>
+ * containing buffer for the stream to use and number of characters
+ * available in this buffer. This method can (and will) be called multiple
+ * times until it returns <code>{nullptr, 0}</code>.
+ *
+ * Note that in C++17 this method can also return
+ * <code>std::tuple<const char_type*, std::size_t><code> or
+ * <code>struct {const char_type*, std::size_t}<code>.
+
  */
 struct in_buffer_provider {};
 
@@ -366,16 +382,17 @@ private:
  * be used as one.
  *
  * This object uses the <code>Sink</code> provided as a template parameter
- * to write data to. The <code>Sink</code> can be either sink or
- * buffer_provider.
+ * to write data to. The <code>Sink</code> type should follow the
+ * specifications of wither {@see sink} or {@see out_buffer_provider}.
  *
  * @tparam Sink sink object to use to write data.
- * @tparam Buffering Buffer size to be used.
- * @tparam CharT character type for this stream
+ * @tparam Buffering Buffer size to be used. It must be {@see non_buffered}
+ *                   if <code>out_buffer_provider</code> is used as
+ *                   <code>Sink</code>
  * @tparam Traits character traits type to be used in this stream.
  *
  * @see sink
- * @see buffer_provider
+ * @see out_buffer_provider
  */
 template<typename Sink, typename Buffering = non_buffered, typename Traits = std::char_traits<typename Sink::char_type>>
 class outstream : public std::basic_ostream<typename Sink::char_type, Traits>
@@ -407,10 +424,11 @@ public:
     /**
      * Main constructor.
      *
-     * This generic constructor will pass received arguments to its buffer, which
-     * in turn will pass them to <code>Sink</code>. Thus, generally, these arguments
-     * should be the ones to create the <code>Sink</code>
+     * This generic constructor will pass received arguments to <code>Sink</code>
+     * constructor.
+     *
      * @tparam Args types of the arguments to forward to <code>Sink</code> constructor
+     *
      * @param args Arguments to be forwarded to construct the <code>Sink</code>
      */
     template <class... Args>
@@ -420,7 +438,8 @@ public:
     }
     /**
      * Move constructor
-     * @param other <code>basic_outstream</code> which contents and state will be acquired
+     *
+     * @param other <code>outstream</code> which contents and state will be acquired
      *              by created object.
      */
     outstream(outstream&& other) noexcept : _ostream_type{}
@@ -430,7 +449,8 @@ public:
     }
     /**
      * Move assignment operator
-     * @param other <code>basic_outstream</code> which contents and state will be acquired
+     *
+     * @param other <code>outstream</code> which contents and state will be acquired
      *              by created object.
      * @return reference to self
      */
@@ -449,12 +469,14 @@ public:
     /**
      * Provides access to the reference to the <code>Sink</code> instance
      * associated with this stream.
+     *
      * @return reference to the <code>Sink</code> instance.
      */
     Sink& operator*() { return buf()->operator*(); }
     /**
      * Provides access to the pointer to the <code>Sink</code> instance
      * associated with this stream.
+     *
      * @return pointer to the <code>Sink</code> instance.
      */
     Sink* operator->() { return buf()->operator->(); }
@@ -462,12 +484,14 @@ public:
     /**
      * Provides access to the constant reference to the <code>Sink</code>
      * instance associated with this stream.
+     *
      * @return const reference to the <code>Sink</code> instance.
      */
     const Sink& operator*() const { return buf()->operator*(); }
     /**
      * Provides access to the constant pointer to the <code>Sink</code>
      * instance associated with this stream.
+     *
      * @return const pointer to the <code>Sink</code> instance.
      */
     const Sink* operator->() const { return buf()->operator->(); }
@@ -651,16 +675,17 @@ private:
  * be used as one.
  *
  * This object uses the <code>Source</code> provided as a template parameter
- * to write data to. The <code>Source</code> can be either source or
- * buffer_provider.
+ * to write data to. The <code>Source</code> type should follow the
+ * specifications of wither {@see source} or {@see in_buffer_provider}.
  *
  * @tparam Source source type to use to read data from.
- * @tparam Buffering Buffer size to be used.
- * @tparam CharT character type for this stream
+ * @tparam Buffering Buffer size to be used. It must be {@see non_buffered}
+ *                   if <code>in_buffer_provider</code> is used as
+ *                   <code>Source</code>
  * @tparam Traits character traits type to be used in this stream.
  *
  * @see source
- * @see buffer_provider
+ * @see in_buffer_provider
  */
 template<typename Source, typename Buffering = non_buffered,
          typename Traits = std::char_traits<typename Source::char_type>>
@@ -693,10 +718,11 @@ public:
     /**
      * Main constructor.
      *
-     * This generic constructor will pass received arguments to its buffer, which
-     * in turn will pass them to <code>Source</code>. Thus, generally, these arguments
-     * should be the ones to create the <code>Source</code>
+     * This generic constructor will pass received arguments to <code>Source</code>
+     * constructor.
+
      * @tparam Args types of the arguments to forward to <code>Source</code> constructor
+     *
      * @param args Arguments to be forwarded to construct the <code>Source</code>
      */
     template <typename... Args>
@@ -710,7 +736,8 @@ public:
     instream(const instream& ) = delete;
     /**
      * Move constructor
-     * @param other <code>basic_instream</code> which contents and state will be acquired
+     *
+     * @param other <code>instream</code> which contents and state will be acquired
      *              by created object.
      */
     instream(instream&& other) noexcept : _istream_type{}
@@ -721,7 +748,8 @@ public:
 
     /**
      * Move assignment operator
-     * @param other <code>basic_instream</code> which contents and state will be acquired
+     *
+     * @param other <code>instream</code> which contents and state will be acquired
      *              by created object.
      * @return reference to self
      */
@@ -838,10 +866,74 @@ private:
     Sink& _sink;
 };
 
-template <typename Device, typename Buffering = non_buffered, typename Traits = std::char_traits<typename Device::char_type>>
+/**
+ * Type definition for output stream which can accept <code>device</code>.
+ *
+ * The purpose of <code>device_instream</code> and
+ * <code>device_outstream</code> classes it to share the same instance of
+ * <code>Device</code>.
+ *
+ * <code>Device</code> is following specifications of both <code>Sink</code>
+ * as prescribed by {@see outstream} and <code>Source</code> as prescribed by
+ * {@see instream}.
+ *
+ * <code>Device</code> class should have type definitions for
+ * <code>in_category</code> (it must be either {@see source} or
+ * {@see in_buffer_provider) and <code>out_category</code> (it must be
+ * wither {@see sink} or {@see out_buffer_provider)
+ *
+ * Class <code>device_outstream</code> can be created with instance of
+ * <code>Device</code> class.
+ *
+ * @tparam Device source type to use to read data from.
+ * @tparam Buffering Buffer size to be used. It must be {@see non_buffered}
+ *                   if <code>out_buffer_provider</code> is used as
+ *                   <code>out_category</code>
+ * @tparam Traits character traits type to be used in this stream.
+ *
+ * @see sink
+ * @see source
+ * @see out_buffer_provider
+ * @see in_buffer_provider
+ * @see device_instream
+ */
+template <typename Device, typename Buffering = non_buffered,
+          typename Traits = std::char_traits<typename Device::char_type>>
 using device_outstream = outstream<device_sink<Device>, Buffering, Traits>;
 
-template <typename Device, typename Buffering = non_buffered, typename Traits = std::char_traits<typename Device::char_type>>
+/**
+ * Type definition for input stream which can accept <code>device</code>.
+ *
+ * The purpose of <code>device_instream</code> and
+ * <code>device_outstream</code> classes it to share the same instance of
+ * <code>Device</code>.
+ *
+ * <code>Device</code> is following specifications of both <code>Sink</code>
+ * as prescribed by {@see outstream} and <code>Source</code> as prescribed by
+ * {@see instream}.
+ *
+ * <code>Device</code> class should have type definitions for
+ * <code>in_category</code> (it must be either {@see source} or
+ * {@see in_buffer_provider) and <code>out_category</code> (it must be
+ * wither {@see sink} or {@see out_buffer_provider)
+ *
+ * Class <code>device_instream</code> can be created with instance of
+ * <code>Device</code> class.
+ *
+ * @tparam Device source type to use to read data from.
+ * @tparam Buffering Buffer size to be used. It must be {@see non_buffered}
+ *                   if <code>in_buffer_provider</code> is used as
+ *                   <code>out_category</code>
+ * @tparam Traits character traits type to be used in this stream.
+ *
+ * @see sink
+ * @see source
+ * @see out_buffer_provider
+ * @see in_buffer_provider
+ * @see device_outstream
+ */
+template <typename Device, typename Buffering = non_buffered,
+          typename Traits = std::char_traits<typename Device::char_type>>
 using device_instream = instream<device_source<Device>, Buffering, Traits>;
 
 } // end of nova namespace
