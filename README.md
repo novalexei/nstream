@@ -1,6 +1,6 @@
 # nova::stream
 
-__nova::stream__ is a single-include-file C++ framework to help defining C++ input/output streams.
+__nova::stream__ is a single-include-file C++ framework to help defining input/output streams.
 
 __nova::stream__ is similar to [boost::iostreams](http://www.boost.org/doc/libs/1_65_1/libs/iostreams/doc/index.html).
 If you're wondering why I had to write my own streams library rather than
