@@ -641,6 +641,10 @@ public:
 protected:
     int_type underflow() override
     {
+        /* This code casts const away. I know that we are not supposed to do this. But, unfortunately
+         * the std::basic_streambuf requires non-const pointers in setg. One way around it: we could require
+         * in_buffer_provider::get_in_buffer to return non-const buffer which would have been weird requirement
+         * for read only buffer. */
 #if __cplusplus > 201700L
         auto [buf, size] = _source.get_in_buffer();
         if (!buf || size <= 0) return traits_type::eof();
